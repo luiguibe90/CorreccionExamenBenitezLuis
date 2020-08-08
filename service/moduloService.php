@@ -10,7 +10,7 @@
  }
   function findAll(){
       $conn = getConnection();
-      return $conn->query("SELECT * from seg_modulo");
+      return $conn->query("SELECT * from seg_modulo WHERE ESTADO= 'ACT'");
   }
   function findByPK($COD_MODULO){
     $conn = getConnection();
@@ -31,7 +31,8 @@
   }
   function delete($COD_MODULO){
     $conn = getConnection();
-    $stmt = $conn->prepare("DELETE FROM seg_modulo WHERE COD_MODULO= '$COD_MODULO'" );
+    $stmt = $conn->prepare("UPDATE seg_modulo set ESTADO = 'PAS' WHERE COD_MODULO=?" );
+    $stmt->bind_param("s", $COD_MODULO);
     $stmt->execute();
     $stmt->close();
 

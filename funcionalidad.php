@@ -1,29 +1,35 @@
 <?php
-include './service/funcionalidadService.php';
-$NOMBRE = "";
-$URL_PRINCIPAL = "";
-$DESCRIPCION = "";
+include './service/moduloService.php';
+include  './service/funcionalidadService.php';
+$nombre = "";
+$url = "";
+$modulo = "";
+$codModulo = "";
+$codFuncionalidad = "";
+$descripcion = "";
 $accion = "Agregar";
-$accionm = "Modificar";
+$eliminarMod = "Eliminar";
+
 
 if (isset($_POST["accion"]) && ($_POST["accion"] == "Agregar")) {
-    insert($_POST["NOMBRE"], $_POST["URL_PRICIPAL"], $_POST["DESCRIPCION"]);
+    insertFun($_POST['modulo'], $_POST["url"], $_POST["nombre"], $_POST["descripcion"]);
 } else if (isset($_POST["accion"]) && ($_POST["accion"] == "Modificar")) {
-    update($_POST["NOMBRE"], $_POST["URL_PRINCIPAL"], $_POST["DESCRIPCION"]);
+    updateFun($_POST["nombre"], $_POST["url"], $_POST["descripcion"], $_POST["codFuncionalidad"]);
 } else if (isset($_GET["update"])) {
-    $FUNCIONALIDAD = findByPK($_GET["update"]);
-    if ($FUNCIONALIDAD != null) {
-        $NOMBRE = $FUNCIONALIDAD["NOMBRE"];
-        $URL_PRINCIPAL = $FUNCIONALIDAD["URL_PRINCIPAL"];
-        $DESCRIPCION = $FUNCIONALIDAD["DESCRIPCION"];       
+    $modulo = findByPKFun($_GET["update"]);
+    if ($modulo != null) {
+        $codFuncionalidad = $modulo["COD_FUNCIONALIDAD"];
+        $nombre = $modulo["NOMBRE"];
+        $url = $modulo["URL_PRINCIPAL"];
+        $descripcion = $modulo["DESCRIPCION"];
         $accion = "Modificar";
     }
-} else if (isset($_POST["elimFuncionalidad"])) {
-    delete($_POST["elimFuncionalidad"]);
+} else if (isset($_POST["eliminarMod"])) {
+    deleteFun($_POST["eliminarMod"]);
 }
+$result = findAll();
+
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="sp">
@@ -59,7 +65,7 @@ if (isset($_POST["accion"]) && ($_POST["accion"] == "Agregar")) {
         <div id="sidebar-wrapper" data-simplebar="" data-simplebar-auto-hide="true">
             <div class="brand-logo ">
                 <a href="index.html">
-                   
+
                     <h5 class="logo-text">Gestion Modulos</h5>
                 </a>
             </div>
@@ -71,8 +77,13 @@ if (isset($_POST["accion"]) && ($_POST["accion"] == "Agregar")) {
                     </a>
                 </li>
                 <li>
-                <a href="./funcionalidad.php">
+                    <a href="./funcionalidad.php">
                         <i class="zmdi zmdi-grid"></i> <span>Funcionalidad</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="./rolModulo.php">
+                        <i class="zmdi zmdi-grid"></i> <span>Roles</span>
                     </a>
                 </li>
             </ul>
@@ -88,108 +99,161 @@ if (isset($_POST["accion"]) && ($_POST["accion"] == "Agregar")) {
                     <div class="col-lg-8">
                         <div class="card">
                             <div class="card-body">
-                                <form id="forma" name="forma" method="post" action="index.php">
+                                <form id="forma" name="forma" method="post" action="funcionalidad.php">
                                     <h5 class="card-title">Funcionalidades</h5>
                                     <div class="table-responsive">
-                                        <table>
+                                        <table class="table table-hover">
                                             <tr>
                                                 <td scope="col" style="width: 1010px;">&nbsp;</td>
-                                               
                                             </tr>
                                         </table>
                                     </div>
                                     <div class="table-responsive">
+                                        <table>
+
+
+                                            <tr>
+                                                <td><label id="lblCategoria" for="categoria">Seleccione Módulo: </label></td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <select class="custom-select" id="modulo" name="modulo">
+                                                        <?php
+                                                        if ($result->num_rows > 0) {
+                                                            while ($row = $result->fetch_assoc()) {
+                                                        ?>
+                                                                <option value="<?php echo $row["COD_MODULO"] ?>">
+                                                                    <?php echo $row["NOMBRE"] ?></option>
+                                                                <?php if (isset($_POST["aceptar"])) { ?>
+                                                                    <option hidden selected>
+                                                                        <?php echo $_POST['modulo'] ?></option>
+                                                        <?php }
+                                                            }
+                                                        } ?>
+                                                    </select>
+                                                    <input class=" btn btn-light btn-round px-4 " name="aceptar" type="submit" value="Aceptar">
+                                                </td>
+
+                                            </tr>
+
+                                        </table>
+
+                                    </div>
+
+                                    <div class="table-responsive">
                                         <table class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col" style="text-align: center;">Nombre</th>
-                                                    <th scope="col" style="text-align: center;">Url Principal </th>
-                                                    <th scope="col" style="text-align: center;">Descripcion</th>
-                                                
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php
-                                                $result = findAll();
-                                                if ($result->num_rows > 0) {
-                                                    while ($row = $result->fetch_assoc()) {
-                                                ?>
-                                                        <tr>
-                                                            <th scope="col" style="text-align: center;"><a href="funcionalidad.php?update=<?php echo $row["NOMBRE"]; ?>"><?php echo $row["NOMBRE"]; ?></a></th>
-                                                            <!-- <th scope="col" style="text-align: center;"><?php echo $row["NOMBRE"]; ?></th> -->
-                                                            <th scope="col" style="text-align: center;"><?php echo $row["URL_PRINCIPAL"]; ?></th>
-                                                            <th scope="col" style="text-align: center;"><?php echo $row["DESCRIPCION"]; ?></th>
-                                                          
-                                                        </tr>
-                                                    <?php
-                                                    }
-                                                } else {
-                                                    ?>
-                                                    <tr>
-                                                        <th scope="col">No hay Funcionalidades Registradas</th>
-                                                    </tr>
-                                                <?php  } ?>
-                                            </tbody>
-                                            
-                                        </td>
-                                        </tr>
+                                            <tr>
+                                                <td scope="col" style="width: 1010px;">&nbsp;</td>
+                                                <td>
+                                                <th><input type="button" name="eliminar" class=" btn btn-light btn-round px-4 " value="Eliminar" onclick="eliminarFuncionalidad();"></th>
+
+                                                </td>
+                                            </tr>
                                         </table>
                                     </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="content-wrapper">
-            <div class="container-fluid">
-                <div class="row mt-3">
-                    <div class="col-lg-5">
-                        <div class="card">
-                            <div class="card-body">
-                                <input type="hidden" name="COD_MODULO" value="<?php echo $COD_MODULO; ?>" />
-                                                                   
-                                <div class="table-responsive">
                                     <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" style="text-align: center;">MODIFICAR</th>
+                                                <th scope="col" style="text-align: center;">NOMBRE</th>
+                                                <th scope="col" style="text-align: center;">URL</th>
+                                                <th scope="col" style="text-align: center;">DESCRIPCION</th>
+                                                <th scope="col" style="text-align: center;">ELIM</th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php
+                                            if (isset($_POST["aceptar"])) {
+                                                $res = findAllFun($_POST['modulo']);
+                                                if ($res->num_rows > 0) {
+                                                    while ($row1 = $res->fetch_assoc()) {
+                                            ?>
+                                                        <tr>
+                                                            <th scope="col" style="text-align: center;"><a href="editFuncionalidad.php?update=<?php echo $row1["COD_FUNCIONALIDAD"]; ?>"><i class="zmdi zmdi-brush"></i></a></th>
+                                                            <th scope="col" style="text-align: center;"><?php echo $row1["NOMBRE"]; ?></td>
+                                                            <th scope="col" style="text-align: center;"><?php echo $row1["URL_PRINCIPAL"]; ?></td>
+                                                            <th scope="col" style="text-align: center;"><?php echo $row1["DESCRIPCION"]; ?></td>
+                                                            <th scope="col" style="text-align: center;"><input type="radio" name="eliminarMod" value="<?php echo $row1["COD_FUNCIONALIDAD"]; ?>">
+                                                                </td>
+                                                        </tr>
+                                                    <?php
+                                                    } ?>
+                                                    <input type="hidden" name="codFuncionalidad" value="<?php echo $codFuncionalidad ?>">
+
+                                        </tbody>
+                                        <table class="table table-hover">
+                                            <tr>
+                                                <td colspan=2 class="text-primary">
+                                                    <h5 class="card-title" style="text-align: center;">Agregar Funcionalidad</h5>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><label id="lblModulo" for="nombre">Nombre: </label></td>
+                                                <td><input type="text" name="nombre" id="nombre" value="<?php echo $nombre ?>" size="25"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><label id="lblNombre" for="url">URL: </label></td>
+                                                <td><input type="text" name="url" id="url" value="<?php echo $url ?>" maxlength="100" size="25"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><label id="lblEstado" for="descripcion">DESCRIPCION: </label></td>
+                                                <td><input type="text" name="descripcion" id="descripcion" value="<?php echo $descripcion ?>" size="25"></td>
+                                            </tr>
+                                            <tr>
+                                                <th><input type="submit" name="accion" class=" btn btn-light btn-round px-4 " value="<?php echo $accion ?>"></td>
+                                            </tr>
+                                        </table>
+                                    <?php } else { ?>
                                         <tr>
-                                            <td><label id="lblnombre" for="nombre">Nombre:</label></td>
-                                            <td><input type="text" name="NOMBRE" value="<?php echo $NOMBRE; ?>" /></td>
+                                            <td class="text-center" colspan="5">Sin Funcionalidades</td>
                                         </tr>
-                                        <tr>
-                                            <td><label id="lblestado">Url:</label></td>
-                                            <td><input type="text" name="URL_PRINCIPAL" value="<?php echo $URL_PRINCIPAL; ?>" /></td>
-                                        </tr>
-                                        <tr>
-                                            <td><label id="lblestado">Descripcion:</label></td>
-                                            <td><input type="text" name="DESCRIPCION" value="<?php echo $DESCRIPCION; ?>" /></td>
-                                        </tr>
-                    
-                                        <tr>
-                                            <td><input type="submit" class=" btn btn-light btn-round px-5 " name="accion" value="<?php echo $accion; ?>" /></td>
-                                            <td><input type="submit" class=" btn btn-light btn-round px-5 " name="accion" value="<?php echo $accionm; ?>" /></td>
-                                        <td><input type="button" name="eliminar" class=" btn btn-light btn-round px-4 " value="Eliminar" onclick="eliminarFuncionalidad();"></td>
-                                        </tr>
+                                        <input type="hidden" name="codFuncionalidad" value="<?php echo $codFuncionalidad ?>">
+
+                                        <table class="table table-hover">
+                                            <tr>
+                                                <td colspan=2><strong>Agregue Funcionalidad</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td><label id="lblModulo" for="nombre">Nombre: </label></td>
+                                                <td><input type="text" name="nombre" id="nombre" value="<?php echo $nombre ?>" size="25"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><label id="lblNombre" for="url">URL: </label></td>
+                                                <td><input type="text" name="url" id="url" value="<?php echo $url ?>" maxlength="100" size="25"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><label id="lblEstado" for="descripcion">DESCRIPCION: </label></td>
+                                                <td><input type="text" name="descripcion" id="descripcion" value="<?php echo $descripcion ?>" size="25"></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan=2><input type="submit" name="accion" value="<?php echo $accion ?>"></td>
+                                            </tr>
+                                        </table>
+                                    <?php }
+                                            } else { ?>
+                                    <tr>
+                                        <td class="text-center" colspan="5">Debe seleccionar un modulo</td>
+                                    </tr>
+                                <?php } ?>
+
                                     </table>
-                                    </form>
-                                </div>
+                                    <!-- hidden ES PARA QUE LOS USUARIOS NO PUEDAN VER NI MODIFICAR DATOS CUANDO SE ENVÍA EN UN FORMULARIO, ESPECIALMENTE ID -->
+
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    <!--   <footer class="footer">
-        <div class="container">
-            <div class="text-center">
-                ESPE
-            </div>
-        </div>
-    </footer> -->
 </body>
+<!-- CODIGO JAVA SCRIPT PARA HACER UN TYPE BUTTON EN SUBMIT -->
 <script>
     function eliminarFuncionalidad() {
-        document.getElementById('forma').submit();
+        document.getElementById("forma").submit();
+    }
+
+    function agregarModulo() {
+        document.getSelection("forma").submit();
     }
 </script>
 

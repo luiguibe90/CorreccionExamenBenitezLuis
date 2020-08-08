@@ -4,7 +4,6 @@ $COD_MODULO = "";
 $NOMBRE = "";
 $ESTADO = "";
 $accion = "Agregar";
-
 if (isset($_POST["accion"]) && ($_POST["accion"] == "Agregar")) {
     insert($_POST["COD_MODULO"], $_POST["NOMBRE"], $_POST["ESTADO"]);
 } else if (isset($_POST["accion"]) && ($_POST["accion"] == "Modificar")) {
@@ -17,9 +16,8 @@ if (isset($_POST["accion"]) && ($_POST["accion"] == "Agregar")) {
         $ESTADO = $MODULO["ESTADO"];
         $accion = "Modificar";
     }
-} else if (isset($_POST["elimModulo"])) {
-
-    delete($_POST["elimModulo"]);
+} else if (isset($_POST["PAS"])) {
+    delete($_POST["PAS"]);
 }
 ?>
 
@@ -76,6 +74,11 @@ if (isset($_POST["accion"]) && ($_POST["accion"] == "Agregar")) {
                         <i class="zmdi zmdi-grid"></i> <span>Funcionalidad</span>
                     </a>
                 </li>
+                <li>
+                    <a href="./rolModulo.php">
+                        <i class="zmdi zmdi-grid"></i> <span>Roles</span>
+                    </a>
+                </li>
             </ul>
         </div>
         <header class="topbar-nav">
@@ -119,7 +122,7 @@ if (isset($_POST["accion"]) && ($_POST["accion"] == "Agregar")) {
                                                             <th scope="col" style="text-align: center;"><a href="index.php?update=<?php echo $row["COD_MODULO"]; ?>"><?php echo $row["COD_MODULO"]; ?></a></th>
                                                             <th scope="col" style="text-align: center;"><?php echo $row["NOMBRE"]; ?></th>
                                                             <th scope="col" style="text-align: center;"><?php echo $row["ESTADO"]; ?></th>
-                                                            <th scope="col" style="text-align: center;"><input type="radio" name="elimModulo" value="<?php echo $row["COD_MODULO"]; ?>"></th>
+                                                            <th scope="col" style="text-align: center;"><input type="radio" name="PAS" value="<?php echo $row["COD_MODULO"]; ?>"></th>
                                                         </tr>
                                                     <?php
                                                     }
@@ -158,7 +161,7 @@ if (isset($_POST["accion"]) && ($_POST["accion"] == "Agregar")) {
                                         </tr>
                                         <tr>
                                             <td><label id="lblestado">Estado:</label></td>
-                                            <td> <select name="ESTADO">
+                                            <td> <select class="custom-select" name="ESTADO">
                                                     <option value="ACT">Activo</option>
                                                     <option value="PAS">Pasivo</option>
                                                 </select></td>
